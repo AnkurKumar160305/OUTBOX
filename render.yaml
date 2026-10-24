@@ -2,7 +2,7 @@ services:
   # 1. Backend Web Service
   - type: web
     name: reachinbox-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: backend
     buildCommand: npm install && npx prisma db push && npx prisma generate && npm run build
@@ -24,14 +24,14 @@ services:
           property: connectionString
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: reachinbox-redis
           property: connectionString
 
   # 2. Frontend Static Site
   - type: web
     name: reachinbox-frontend
-    env: static
+    runtime: static
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
@@ -41,15 +41,15 @@ services:
         source: /*
         destination: /index.html
 
+  # 3. Redis Service (Key-Value)
+  - type: keyvalue
+    name: reachinbox-redis
+    plan: free
+    ipAllowList: []
+
 databases:
-  # 3. PostgreSQL Database
+  # 4. PostgreSQL Database
   - name: reachinbox-postgres
     plan: free
     databaseName: reachinbox
     user: postgres
-
-# 4. Redis Service
-  - type: redis
-    name: reachinbox-redis
-    plan: free
-    ipAllowList: [] # internal only
