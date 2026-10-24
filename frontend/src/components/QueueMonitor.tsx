@@ -36,7 +36,7 @@ export const QueueMonitor: React.FC = () => {
             <span>Reload Board</span>
           </button>
           <a
-            href="http://localhost:5000/admin/queues"
+            href={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')}/admin/queues`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm"
@@ -51,7 +51,7 @@ export const QueueMonitor: React.FC = () => {
       <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl h-[650px] relative">
         <iframe
           key={iframeKey}
-          src="http://localhost:5000/admin/queues"
+          src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')}/admin/queues`}
           title="BullMQ Live Queue Monitor"
           className="w-full h-full border-0 bg-slate-950"
         />

@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* BullMQ Dashboard External Link */}
           <a
-            href="http://localhost:5000/admin/queues"
+            href={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')}/admin/queues`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 transition"
