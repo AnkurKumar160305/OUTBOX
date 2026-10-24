@@ -1,0 +1,86 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String           @id @default(uuid())
+  email       String           @unique
+  name        String?
+  avatar      String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  slackConfig SlackConfig?
+  campaigns   Campaign[]
+  emails      ScheduledEmail[]
+}
+
+model SlackConfig {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webhookUrl String?
+  botToken   String?
+  channel    String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Campaign {
+  id                 String           @id @default(uuid())
+  userId             String
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title              String
+  senderEmail        String
+  subject            String
+  body               String
+  totalRecipients    Int
+  delayBetweenEmails Int              @default(2) // in seconds
+  hourlyLimit        Int              @default(50) // emails per hour
+  startTime          DateTime
+  createdAt          DateTime         @default(now())
+  emails             ScheduledEmail[]
+}
+
+model ScheduledEmail {
+  id                 String    @id @default(uuid())
+  campaignId         String?
+  campaign           Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderEmail        String
+  recipientEmail     String
+  subject            String
+  body               String
+  status             String    @default("SCHEDULED") // SCHEDULED, PROCESSING, SENT, FAILED, RATE_LIMITED
+  scheduledAt        DateTime
+  sentAt             DateTime?
+  failedReason       String?
+  jobId              String?   @unique
+  etherealPreviewUrl String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([senderEmail, status])
+  @@index([scheduledAt])
+}
+
+model RateLimitEvent {
+  id                   String   @id @default(uuid())
+  senderEmail          String
+  hourWindow           String
+  emailsInWindow       Int
+  maxLimit             Int
+  rescheduledJobsCount Int      @default(0)
+  delayedUntil         DateTime
+  notifiedSlack        Boolean  @default(false)
+  createdAt            DateTime @default(now())
+
+  @@index([senderEmail, hourWindow])
+}
