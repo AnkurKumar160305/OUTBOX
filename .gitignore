@@ -9,6 +9,7 @@ build/
 
 # Local databases and runtime data
 pgdata/
+*.rdb
 *.log
 .DS_Store
 
